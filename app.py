@@ -1,4 +1,4 @@
-from flask import Flask, redirect, jsonify 
+from flask import Flask, redirect, jsonify, request 
 from flask_sqlalchemy import SQLAlchemy 
 from sqlalchemy import func 
 from http import HTTPStatus
@@ -37,7 +37,16 @@ def decodeShortURL(short_url):
 
 @app.route("/", methods=["POST"])
 def encodeShortURL():
-    # Placeholder
+    # First we need to check whether the user is authorized to create a short url
+    # (I'm the only one who's authorized tee-hee)
+    tokens = db.session.execute(text("SELECT * FROM TOKENS")).scalars()
+    data = request.get_json()
+
+    auth_token = data.get('token')
+    if not auth_token:
+        return jsonify({'message': "Unauthorized"}, HTTPStatus.UNAUTHORIZED)
+
+
     return HTTPStatus.CREATED 
 
 if __name__ == '__main__':
