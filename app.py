@@ -1,6 +1,6 @@
 from flask import Flask, redirect, jsonify, request 
 from flask_sqlalchemy import SQLAlchemy 
-from sqlalchemy import func 
+from sqlalchemy import func, text 
 from http import HTTPStatus
 import yaml 
 
@@ -15,9 +15,8 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
 class URLS(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    short_url = db.Column(db.String(50), primary_key=True)
     url = db.Column(db.String(255), nullable=False)
-    short_url = db.Column(db.String(50), nullable=False)
     created_at = db.Column(db.DateTime(timezone=True), server_default=func.now())
 
 class TOKENS(db.Model):
@@ -37,17 +36,41 @@ def decodeShortURL(short_url):
 
 @app.route("/", methods=["POST"])
 def encodeShortURL():
-    # First we need to check whether the user is authorized to create a short url
-    # (I'm the only one who's authorized tee-hee)
-    tokens = db.session.execute(text("SELECT * FROM TOKENS")).scalars()
     data = request.get_json()
+
+    required = ['url', 'short_url', 'token']
+    for field in required:
+        if field not in data:
+            return jsonify({"message": "Missing one of the required fields - url or short_url"}), HTTPStatus.BAD_REQUEST
+    
+    # First we need to check whether the user is authorized to create a short url
+    tokens = db.session.execute(text("SELECT token FROM TOKENS")).scalars().all()
 
     auth_token = data.get('token')
     if not auth_token:
-        return jsonify({'message': "Unauthorized"}, HTTPStatus.UNAUTHORIZED)
+        return jsonify({'message': "Invalid token"}, HTTPStatus.UNAUTHORIZED)
 
+    url = data.get('url')
+    short_url = data.get('short_url')
 
-    return HTTPStatus.CREATED 
+    # Check if short_url already exists
+    # I might write an UPDATE method later on
+    match = db.session.execute(db.select(URLS).filter_by(short_url=short_url)).scalar_one_or_none()
+    if match is not None:
+        return jsonify({"message": "Short URL already exists"}), HTTPStatus.CONFLICT
+
+    shortened = URLS(url=url, short_url=short_url, created_at=func.now())
+    db.session.add(shortened)
+    try:
+        db.session.commit()
+    except Exception as e: 
+        return jsonify({"message": "Insert unsuccessful"}), HTTPStatus.INTERNAL_SERVER_ERROR
+    
+    return jsonify({
+        "url": shortened.url,
+        "short_url": shortened.short_url,
+        "created_at": shortened.created_at
+    }), HTTPStatus.CREATED
 
 if __name__ == '__main__':
     app.run()
