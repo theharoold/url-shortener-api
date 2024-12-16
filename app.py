@@ -49,15 +49,17 @@ def decodeShortURL(short_url):
     if not url:
         return jsonify({"message": "URL Not Found"}), HTTPStatus.NOT_FOUND
 
-    return redirect(url.url, HTTPStatus.PERMANENT_REDIRECT)
+    return redirect(url.url, HTTPStatus.TEMPORARY_REDIRECT)
 
-@app.route("/", methods=["POST"])
+@app.route("/", methods=["POST", "PUT"])
 @authenticate
 def encodeShortURL():
     try:
         data = request.get_json()
     except Exception as e:
         return jsonify({"message": "Invalid POST body"}), HTTPStatus.BAD_REQUEST
+
+    now = func.now()
 
     required = ['url', 'short_url']
     for field in required:
@@ -68,13 +70,20 @@ def encodeShortURL():
     short_url = data.get('short_url')
 
     # Check if short_url already exists
-    # I might write an UPDATE method later on
-    match = db.session.execute(db.select(URLS).filter_by(short_url=short_url)).scalar_one_or_none()
-    if match is not None:
-        return jsonify({"message": "Short URL already exists"}), HTTPStatus.CONFLICT
+    # But only for creating a new short_url
+    # Updating should create new or replace existing short_url (PUT)
+    if request.method == "POST":
+        match = db.session.execute(db.select(URLS).filter_by(short_url=short_url)).scalar_one_or_none()
+        if match is not None:
+            return jsonify({"message": "Short URL already exists"}), HTTPStatus.CONFLICT
 
-    shortened = URLS(url=url, short_url=short_url, created_at=func.now())
-    db.session.add(shortened)
+    if request.method == "POST":
+        shortened = URLS(url=url, short_url=short_url, created_at=now)
+        db.session.add(shortened)
+    else:
+        shortened = URLS.query.filter_by(short_url=short_url).first()
+        shortened.url = url 
+        shortened.created_at = now
     try:
         db.session.commit()
     except Exception as e: 
