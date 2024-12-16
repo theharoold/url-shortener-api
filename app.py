@@ -68,6 +68,8 @@ def encodeShortURL():
 
     url = data.get('url')
     short_url = data.get('short_url')
+    if len(url) > 255 or len(short_url) > 50:
+        return jsonify({"message": "URL or short URL are too long"}), HTTPStatus.BAD_REQUEST
 
     # Check if short_url already exists
     # But only for creating a new short_url
