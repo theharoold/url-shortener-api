@@ -3,6 +3,7 @@ from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy import func, text 
 from http import HTTPStatus
 import yaml 
+from functools import wraps 
 
 with open('config/config.yaml') as f:
     config = yaml.load(f, yaml.Loader)
@@ -26,6 +27,22 @@ class TOKENS(db.Model):
 with app.app_context():
     db.create_all()
 
+def authenticate(f):
+    @wraps(f)
+    def decoratorFunction(*args, **kwargs):
+        auth_token = request.headers.get('Authorization')
+        if auth_token is None:
+            return jsonify({'message': "Missing authorization token"}), HTTPStatus.UNAUTHORIZED
+
+        # First we need to check whether the user is authorized to create a short url
+        tokens = db.session.execute(text("SELECT token FROM TOKENS")).scalars().all()
+
+        if auth_token not in tokens:
+            return jsonify({'message': "Invalid token"}), HTTPStatus.UNAUTHORIZED
+        
+        return f(*args, **kwargs)
+    return decoratorFunction
+
 @app.route("/<short_url>", methods=["GET"])
 def decodeShortURL(short_url):
     url = db.session.execute(db.select(URLS).filter_by(short_url=short_url)).scalar_one_or_none()
@@ -35,20 +52,17 @@ def decodeShortURL(short_url):
     return redirect(url.url, HTTPStatus.PERMANENT_REDIRECT)
 
 @app.route("/", methods=["POST"])
+@authenticate
 def encodeShortURL():
-    data = request.get_json()
+    try:
+        data = request.get_json()
+    except Exception as e:
+        return jsonify({"message": "Invalid POST body"}), HTTPStatus.BAD_REQUEST
 
-    required = ['url', 'short_url', 'token']
+    required = ['url', 'short_url']
     for field in required:
         if field not in data:
             return jsonify({"message": "Missing one of the required fields - url or short_url"}), HTTPStatus.BAD_REQUEST
-    
-    # First we need to check whether the user is authorized to create a short url
-    tokens = db.session.execute(text("SELECT token FROM TOKENS")).scalars().all()
-
-    auth_token = data.get('token')
-    if not auth_token:
-        return jsonify({'message': "Invalid token"}, HTTPStatus.UNAUTHORIZED)
 
     url = data.get('url')
     short_url = data.get('short_url')
