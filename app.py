@@ -82,8 +82,12 @@ def encodeShortURL():
         db.session.add(shortened)
     else:
         shortened = URLS.query.filter_by(short_url=short_url).first()
-        shortened.url = url 
-        shortened.created_at = now
+        if not shortened:
+            shortened = URLS(url=url, short_url=short_url, created_at=now)
+            db.session.add(shortened)
+        else:
+            shortened.url = url 
+            shortened.created_at = now
     try:
         db.session.commit()
     except Exception as e: 
