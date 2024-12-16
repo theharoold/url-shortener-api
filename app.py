@@ -10,7 +10,7 @@ with open('config/config.yaml') as f:
 
 app = Flask(__name__)
 # Setup DSN
-app.config['SQLALCHEMY_DATABASE_URI'] = f"mysql://{config['db']['username']}:{config['db']['password']}" +\
+app.config['SQLALCHEMY_DATABASE_URI'] = f"{config['db']['dbms']}://{config['db']['username']}:{config['db']['password']}" +\
 f"@{config['db']['host']}:{config['db']['port']}/{config['db']['name']}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
