@@ -35,7 +35,7 @@ def authenticate(f):
             return jsonify({'message': "Missing authorization token"}), HTTPStatus.UNAUTHORIZED
 
         # First we need to check whether the user is authorized to create a short url
-        tokens = db.session.execute(text("SELECT token FROM TOKENS")).scalars().all()
+        tokens = db.session.execute(text("SELECT token FROM tokens")).scalars().all()
 
         if auth_token not in tokens:
             return jsonify({'message': "Invalid token"}), HTTPStatus.UNAUTHORIZED
