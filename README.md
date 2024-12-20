@@ -63,6 +63,25 @@ Example response:
 
 Usage is the same as with `POST /`, example is given above, with a slight exception - this one is used to create **or replace** a short_url.
 
+- `DELETE /` - deletes short url record
+
+Returns 204 NO CONTENT if a record has been successfully deleted, 404 NOT FOUND if no such element exists.
+
+Example request:
+
+`DELETE / HTTP/1.1`
+`Authorization: token`
+`Content-Type: application/json`
+
+`{`
+`    "short_url": "my-website"`
+`}`
+
+Example response:
+
+`204 NO CONTENT`
+
+
 ## Error messages
 
 If the request fails at any point, you will receive a response that looks like this:
