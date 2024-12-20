@@ -61,7 +61,7 @@ def encodeShortURL():
 
     now = func.now()
 
-    required = ['url', 'short_url']
+    required = ['short_url', 'url']
     for field in required:
         if field not in data:
             return jsonify({"message": "Missing one of the required fields - url or short_url"}), HTTPStatus.BAD_REQUEST
@@ -100,6 +100,30 @@ def encodeShortURL():
         "short_url": shortened.short_url,
         "created_at": shortened.created_at
     }), HTTPStatus.CREATED
+
+@app.route("/", methods=["DELETE"])
+@authenticate
+def deleteShortURL():
+    try:
+        data = request.get_json()
+    except Exception as e:
+        return jsonify({"message": "Invalid POST body"}), HTTPStatus.BAD_REQUEST
+    
+    key = data.get('short_url')
+    if key is None:
+        return jsonify({"message": "Missing required field - short_url"}), HTTPStatus.BAD_REQUEST
+    
+    url = db.session.query(URLS).get(key)
+    if url is None:
+        return jsonify({"message": "URL Not Found"}), HTTPStatus.NOT_FOUND
+    else:
+        try:
+            db.session.delete(url)
+            db.session.commit()
+        except Exception as e:
+            return jsonify({"message": "Delete unsuccessful"}), HTTPStatus.INTERNAL_SERVER_ERROR
+        
+        return '', HTTPStatus.NO_CONTENT
 
 if __name__ == '__main__':
     app.run()
