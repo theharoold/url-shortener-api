@@ -2,6 +2,11 @@ body {
     margin: 0;
 }
 
+:root {
+    --green: rgb(33, 157, 33);
+    --red: rgb(175, 19, 19);
+}
+
 * {
     font-family: Arial;
 }
@@ -22,4 +27,15 @@ header {
     color: white;
     font-weight: bold;
     font-size: 36px;
+}
+
+#request_result {
+    padding: 20px 30px;
+    background-color: var(--green);
+    border-radius: 15px;
+    border: 5px double rgb(2, 2, 2);
+    color: white;
+    width: 200px;
+    text-align: center;
+    display:none;
 }

@@ -1,5 +1,6 @@
 from flask import Flask, redirect, jsonify, request 
 from flask_sqlalchemy import SQLAlchemy 
+from flask_cors import CORS 
 from sqlalchemy import func, text 
 from http import HTTPStatus
 import yaml 
@@ -9,6 +10,7 @@ with open('config/config.yaml') as f:
     config = yaml.load(f, yaml.Loader)
 
 app = Flask(__name__)
+cors = CORS(app)
 # Setup DSN
 app.config['SQLALCHEMY_DATABASE_URI'] = f"{config['db']['dbms']}://{config['db']['username']}:{config['db']['password']}" +\
 f"@{config['db']['host']}:{config['db']['port']}/{config['db']['name']}"
@@ -123,7 +125,13 @@ def deleteShortURL():
         except Exception as e:
             return jsonify({"message": "Delete unsuccessful"}), HTTPStatus.INTERNAL_SERVER_ERROR
         
-        return '', HTTPStatus.NO_CONTENT
+        print(jsonify({
+            "short_url": key
+        }))
+
+        return jsonify({
+            "short_url": key
+        }), HTTPStatus.OK
 
 if __name__ == '__main__':
     app.run()

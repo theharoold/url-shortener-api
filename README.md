@@ -65,7 +65,7 @@ Usage is the same as with `POST /`, example is given above, with a slight except
 
 - `DELETE /` - deletes short url record
 
-Returns 204 NO CONTENT if a record has been successfully deleted, 404 NOT FOUND if no such element exists.
+Returns 200 OK if a record has been successfully deleted, 404 NOT FOUND if no such element exists.
 
 Example request:
 
@@ -79,7 +79,11 @@ Example request:
 
 Example response:
 
-`204 NO CONTENT`
+`200 OK`
+
+`{`
+`    "short_url": "my-website"`
+`}`
 
 
 ## Error messages

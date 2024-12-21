@@ -6,6 +6,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>URL Shortener | Veljko Loncarevic</title>
     <link rel="stylesheet" href="style.css">
+    <script src="send-request.js"></script>
 </head>
 <body>
     <header>
@@ -26,21 +27,26 @@
 
     <div>
         <form>
+            <h3 id="request_result">Hello, world!</h3>
             <div>
                 <div>
-                    <label>Operation</label>
-                    <input>
-                    <label>Authorization token</label>
-                    <input>
+                    <label for="operation">Operation</label>
+                    <select id="operation" name="operation">
+                        <option value="insert">Insert</option>
+                        <option value="update">Update</option>
+                        <option value="delete">Delete</option>
+                    </select>
+                    <label for="auth_token">Authorization token</label>
+                    <input id="auth_token" name="auth_token">
                 </div>
                 <div>
-                    <label>Short code</label>
-                    <input>
-                    <label>Target URL</label>
-                    <input>
+                    <label for="short_url">Short code</label>
+                    <input id="short_url" name="short_url">
+                    <label for="url">Target URL</label>
+                    <input id="url" name="url">
                 </div>
             </div>
-            <buttom>Submit</buttom>
+            <button type="button" onclick="sendRequest();">Submit</button>
         </form>
     </div>
 
