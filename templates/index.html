@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <title>URL Shortener | Veljko Loncarevic</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="send-request.js"></script>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="{{ url_for('static', filename='js/send-request.js') }}"></script>
 </head>
 <body>
     <header>

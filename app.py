@@ -1,4 +1,4 @@
-from flask import Flask, redirect, jsonify, request 
+from flask import Flask, redirect, jsonify, request, render_template 
 from flask_sqlalchemy import SQLAlchemy 
 from flask_cors import CORS 
 from sqlalchemy import func, text 
@@ -44,6 +44,10 @@ def authenticate(f):
         
         return f(*args, **kwargs)
     return decoratorFunction
+
+@app.route("/", methods=["GET"])
+def returnHomeTemplate():
+    return render_template('index.html')
 
 @app.route("/<short_url>", methods=["GET"])
 def decodeShortURL(short_url):
