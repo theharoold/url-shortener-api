@@ -48,7 +48,7 @@ let sendRequest = () => {
     })
     .catch(error => {
         request_result.textContent = error.message;
-        request_result.style.display = "block";
+        request_result.style.opacity = 1;
         request_result.style.backgroundColor = "var(--red)";
     });
 }

@@ -25,11 +25,10 @@
         </div>
     </header>
 
-    <div>
+    <div class="main-content">
         <form>
-            <h3 id="request_result">Hello, world!</h3>
-            <div>
-                <div>
+            <div class="form-content">
+                <div class="form-content-sub">
                     <label for="operation">Operation</label>
                     <select id="operation" name="operation">
                         <option value="insert">Insert</option>
@@ -39,7 +38,7 @@
                     <label for="auth_token">Authorization token</label>
                     <input id="auth_token" name="auth_token">
                 </div>
-                <div>
+                <div class="form-content-sub">
                     <label for="short_url">Short code</label>
                     <input id="short_url" name="short_url">
                     <label for="url">Target URL</label>
@@ -48,6 +47,9 @@
             </div>
             <button type="button" onclick="sendRequest();">Submit</button>
         </form>
+        <div class="result-div">
+            <div id="request_result"></div>
+        </div>
     </div>
 
     <footer>
