@@ -41,7 +41,7 @@ let sendRequest = () => {
     })
     .then(body => {
         op = (operation == 'insert') ? "inserted" : (operation == 'delete') ? "deleted" : "updated";
-        request_result.textContent = 'Short URL successfully ' + op;
+        request_result.textContent = 'Short URL https://short.veljkoloncarevic.in.rs/' + short_url +  ' successfully ' + op;
         request_result.style.display = 'block';
         request_result.style.backgroundColor = "var(--green)";
     })
