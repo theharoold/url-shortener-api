@@ -1,6 +1,8 @@
 from flask import Flask, redirect, jsonify, request, render_template 
 from flask_sqlalchemy import SQLAlchemy 
 from flask_cors import CORS 
+from flask_limiter import Limiter 
+from flask_limiter.util import get_remote_address 
 from sqlalchemy import func, text 
 from http import HTTPStatus
 import yaml 
@@ -15,6 +17,12 @@ cors = CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = f"{config['db']['dbms']}://{config['db']['username']}:{config['db']['password']}" +\
 f"@{config['db']['host']}:{config['db']['port']}/{config['db']['name']}"
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+limiter = Limiter(
+    get_remote_address,
+    app=app,
+    default_limits=["5 per second"]
+)
 
 db = SQLAlchemy(app)
 class URLS(db.Model):
@@ -46,10 +54,12 @@ def authenticate(f):
     return decoratorFunction
 
 @app.route("/", methods=["GET"])
+@limiter.limit("5 per second")
 def returnHomeTemplate():
     return render_template('index.html')
 
 @app.route("/<short_url>", methods=["GET"])
+@limiter.limit("5 per second")
 def decodeShortURL(short_url):
     url = db.session.execute(db.select(URLS).filter_by(short_url=short_url)).scalar_one_or_none()
     if not url:
@@ -58,6 +68,7 @@ def decodeShortURL(short_url):
     return redirect(url.url, HTTPStatus.TEMPORARY_REDIRECT)
 
 @app.route("/", methods=["POST", "PUT"])
+@limiter.limit("5 per second")
 @authenticate
 def encodeShortURL():
     try:
@@ -108,6 +119,7 @@ def encodeShortURL():
     }), HTTPStatus.CREATED
 
 @app.route("/", methods=["DELETE"])
+@limiter.limit("5 per second")
 @authenticate
 def deleteShortURL():
     try:
