@@ -1,6 +1,5 @@
 let sendRequest = () => {
-    // let api_url = 'https://short.veljkoloncarevic.in.rs/';
-    let api_url = 'http://localhost:5000/';
+    let api_url = 'https://short.veljkoloncarevic.in.rs/';
 
     let request_result = document.getElementById('request_result');
     let operation = document.getElementById('operation').value;
