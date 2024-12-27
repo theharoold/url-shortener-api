@@ -41,11 +41,15 @@ header {
 
 #request_result {
     padding: 20px 30px;
+    margin-top: 10px;
+    margin-bottom: 50px;
+    margin-left: 15px;
+    margin-right: 15px;
     background-color: var(--green);
     border-radius: 15px;
     border: 5px double rgb(2, 2, 2);
     color: white;
-    width: 200px;
+    min-width: 200px;
     text-align: center;
     opacity: 0;
 }
